@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Datasets
+{% endblock %}
+
+
+{% block content %}
+
+
+<style>
+
+    /* =====================================================
+       DATASET DELETE BUTTON
+    ====================================================== */
+
+    .dataset-delete-button {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        min-height: 38px;
+
+        padding:
+            8px 13px;
+
+        margin-left: 5px;
+
+        border:
+            1px solid #dc2626;
+
+        border-radius: 7px;
+
+        color: #ffffff;
+
+        background: #dc2626;
+
+        font-family: inherit;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        line-height: 1.2;
+
+        cursor: pointer;
+
+        transition:
+            background 0.15s ease,
+            border-color 0.15s ease,
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
+
+    }
+
+
+    .dataset-delete-button:hover {
+
+        background: #b91c1c;
+
+        border-color: #b91c1c;
+
+        transform:
+            translateY(-1px);
+
+        box-shadow:
+            0 4px 10px
+            rgba(
+                220,
+                38,
+                38,
+                0.20
+            );
+
+    }
+
+
+    .dataset-delete-button:focus-visible {
+
+        outline:
+            3px solid
+            rgba(
+                220,
+                38,
+                38,
+                0.20
+            );
+
+        outline-offset: 2px;
+
+    }
+
+
+    /* =====================================================
+       ACTION AREA
+    ====================================================== */
+
+    .dataset-actions {
+
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 5px;
+
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ====================================================== */
+
+    @media (max-width: 700px) {
+
+        .dataset-actions {
+
+            flex-direction: column;
+
+            align-items: stretch;
+
+        }
+
+
+        .dataset-actions .btn,
+        .dataset-delete-button {
+
+            width: 100%;
+
+            margin-left: 0;
+
+        }
+
+    }
+
+</style>
+
+
+<!-- =====================================================
+     PAGE HEADER
+====================================================== -->
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            Datasets
+        </h1>
+
+        <p class="page-subtitle">
+
+            View and manage your uploaded datasets.
+
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('main.upload') }}"
+        class="btn btn-primary"
+    >
+
+        Upload New Dataset
+
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     FLASH MESSAGES
+====================================================== -->
+
+{% with messages = get_flashed_messages(
+    with_categories=true
+) %}
+
+    {% if messages %}
+
+        <div class="flash-container">
+
+            {% for category, message in messages %}
+
+                <div
+                    class="flash-message
+                    flash-{{ category }}"
+                >
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+
+<!-- =====================================================
+     DATASET CARD
+====================================================== -->
+
+<div class="card">
+
+
+    {% if datasets %}
+
+
+        <div class="table-container">
+
+
+            <table class="data-table">
+
+
+                <!-- =================================================
+                     TABLE HEADER
+                ================================================== -->
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            File Name
+                        </th>
+
+                        <th>
+                            Type
+                        </th>
+
+                        <th>
+                            Rows
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Uploaded At
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <!-- =================================================
+                     TABLE BODY
+                ================================================== -->
+
+                <tbody>
+
+
+                    {% for dataset in datasets %}
+
+
+                        <tr>
+
+
+                            <!-- =====================================
+                                 ID
+                            ====================================== -->
+
+                            <td>
+
+                                {{ dataset.id }}
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 FILE NAME
+                            ====================================== -->
+
+                            <td>
+
+                                <strong>
+
+                                    {{ dataset.file_name }}
+
+                                </strong>
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 FILE TYPE
+                            ====================================== -->
+
+                            <td>
+
+                                {{ dataset.file_type|upper }}
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 ROW COUNT
+                            ====================================== -->
+
+                            <td>
+
+                                {{ dataset.row_count }}
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 STATUS
+                            ====================================== -->
+
+                            <td>
+
+
+                                {% if dataset.status == "processed" %}
+
+
+                                    <span
+                                        class="status-badge
+                                        status-success"
+                                    >
+
+                                        Processed
+
+                                    </span>
+
+
+                                {% elif dataset.status == "processing" %}
+
+
+                                    <span
+                                        class="status-badge
+                                        status-warning"
+                                    >
+
+                                        Processing
+
+                                    </span>
+
+
+                                {% elif dataset.status == "failed" %}
+
+
+                                    <span
+                                        class="status-badge"
+                                    >
+
+                                        Failed
+
+                                    </span>
+
+
+                                {% else %}
+
+
+                                    <span
+                                        class="status-badge"
+                                    >
+
+                                        {{ dataset.status }}
+
+                                    </span>
+
+
+                                {% endif %}
+
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 UPLOADED DATE
+                            ====================================== -->
+
+                            <td>
+
+                                {{ dataset.uploaded_at.strftime(
+                                    "%Y-%m-%d %H:%M"
+                                ) }}
+
+                            </td>
+
+
+                            <!-- =====================================
+                                 ACTIONS
+                            ====================================== -->
+
+                            <td>
+
+
+                                <div class="dataset-actions">
+
+
+                                    <!-- =============================
+                                         PREVIEW
+                                    ============================== -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'main.preview_dataset',
+                                            dataset_id=dataset.id
+                                        ) }}"
+                                        class="btn btn-secondary"
+                                    >
+
+                                        Preview
+
+                                    </a>
+
+
+                                    <!-- =============================
+                                         REPORT
+                                    ============================== -->
+
+                                    {% if dataset.status == "processed" %}
+
+
+                                        <a
+                                            href="{{ url_for(
+                                                'main.report',
+                                                dataset_id=dataset.id
+                                            ) }}"
+                                            class="btn btn-primary"
+                                        >
+
+                                            Report
+
+                                        </a>
+
+
+                                    {% endif %}
+
+
+                                    <!-- =============================
+                                         DELETE
+                                    ============================== -->
+
+                                    <form
+                                        action="{{ url_for(
+                                            'dataset_delete.delete_dataset',
+                                            dataset_id=dataset.id
+                                        ) }}"
+                                        method="POST"
+                                        style="display: inline;"
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to delete this dataset?\\n\\nThis will permanently delete the selected dataset, its stored sales records, and its upload logs.\\n\\nThis action cannot be undone.'
+                                        );"
+                                    >
+
+
+                                        <button
+                                            type="submit"
+                                            class="dataset-delete-button"
+                                        >
+
+                                            Delete
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                </div>
+
+
+                            </td>
+
+
+                        </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-state">
+
+
+            <h2>
+                No datasets yet
+            </h2>
+
+
+            <p>
+
+                Upload a CSV or Excel file to start
+                analyzing your data.
+
+            </p>
+
+
+            <a
+                href="{{ url_for('main.upload') }}"
+                class="btn btn-primary"
+            >
+
+                Upload Dataset
+
+            </a>
+
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}

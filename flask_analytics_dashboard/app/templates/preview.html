@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Dataset Preview
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>{{ dataset.file_name }}</h1>
+
+    <p>
+        Dataset preview and data analysis information.
+    </p>
+
+</div>
+
+
+<!-- Statistics -->
+
+<div class="kpi-grid">
+
+    <div class="kpi-card">
+
+        <h3>Total Rows</h3>
+
+        <h2>
+            {{ summary.row_count }}
+        </h2>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+        <h3>Total Columns</h3>
+
+        <h2>
+            {{ summary.column_count }}
+        </h2>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+        <h3>Duplicate Rows</h3>
+
+        <h2>
+            {{ summary.duplicate_rows }}
+        </h2>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+        <h3>File Type</h3>
+
+        <h2>
+            {{ dataset.file_type.upper() }}
+        </h2>
+
+    </div>
+
+</div>
+
+
+<!-- Columns -->
+
+<div class="welcome-card">
+
+    <h2>Columns</h2>
+
+    <div class="column-list">
+
+        {% for column in summary.columns %}
+
+            <span class="column-badge">
+                {{ column }}
+            </span>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<br>
+
+
+<!-- Data Preview -->
+
+<div class="dataset-table-container">
+
+    <h2>Data Preview</h2>
+
+    <br>
+
+    <div class="table-scroll">
+
+        <table class="dataset-table">
+
+            <thead>
+
+                <tr>
+
+                    {% for column in columns %}
+
+                    <th>
+                        {{ column }}
+                    </th>
+
+                    {% endfor %}
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in rows %}
+
+                <tr>
+
+                    {% for column in columns %}
+
+                    <td>
+                        {{ row[column] }}
+                    </td>
+
+                    {% endfor %}
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<br>
+
+
+<!-- Data Type Information -->
+
+<div class="welcome-card">
+
+    <h2>Data Types</h2>
+
+    <table class="dataset-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Column</th>
+                <th>Data Type</th>
+                <th>Missing Values</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for column in summary.columns %}
+
+            <tr>
+
+                <td>
+                    {{ column }}
+                </td>
+
+                <td>
+                    {{ summary.data_types[column] }}
+                </td>
+
+                <td>
+                    {{ summary.missing_values[column] }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}File Too Large{% endblock %}
+
+{% block content %}
+
+<div class="error-page">
+
+    <div>
+
+        <h1>413</h1>
+
+        <h2>File Too Large</h2>
+
+        <p>
+            The uploaded file is larger than the
+            allowed 16 MB limit.
+        </p>
+
+        <a
+            href="{{ url_for('main.upload') }}"
+            class="btn btn-primary"
+        >
+            Try Another File
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

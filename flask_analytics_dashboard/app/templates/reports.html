@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Reports - Analytics Dashboard
+    </title>
+
+
+    <!-- =====================================================
+         COMMON DASHBOARD CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+
+    <style>
+
+        /* =================================================
+           REPORT PAGE
+        ================================================= */
+
+        .reports-page {
+
+            width: min(
+                1100px,
+                calc(100% - 48px)
+            );
+
+            margin: 40px auto 60px;
+
+        }
+
+
+        .reports-header {
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .reports-header h1 {
+
+            margin: 0 0 8px;
+
+            color: #172033;
+
+            font-size: 36px;
+
+            line-height: 1.2;
+
+            font-weight: 800;
+
+        }
+
+
+        .reports-header p {
+
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 16px;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* =================================================
+           REPORT GRID
+        ================================================= */
+
+        .report-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(
+                        0,
+                        1fr
+                    )
+                );
+
+            gap: 20px;
+
+        }
+
+
+        /* =================================================
+           REPORT CARD
+        ================================================= */
+
+        .report-card {
+
+            background: #ffffff;
+
+            border:
+                1px solid #e1e5ec;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.06
+                );
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease,
+                border-color 0.18s ease;
+
+        }
+
+
+        .report-card:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                #d6d9e2;
+
+            box-shadow:
+                0 8px 22px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.09
+                );
+
+        }
+
+
+        .report-card h3 {
+
+            margin: 0 0 12px;
+
+            color: #172033;
+
+            font-size: 18px;
+
+            line-height: 1.4;
+
+            font-weight: 750;
+
+            word-break: break-word;
+
+        }
+
+
+        /* =================================================
+           REPORT INFORMATION
+        ================================================= */
+
+        .report-info {
+
+            margin-bottom: 18px;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.45;
+
+        }
+
+
+        .report-info div {
+
+            margin-bottom: 2px;
+
+        }
+
+
+        /* =================================================
+           VIEW REPORT BUTTON
+        ================================================= */
+
+        .report-button {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 41px;
+
+            padding:
+                10px 16px;
+
+            border-radius: 7px;
+
+            background:
+                #1565c0;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition:
+                background 0.15s ease,
+                transform 0.15s ease;
+
+        }
+
+
+        .report-button:hover {
+
+            background:
+                #1257a5;
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .report-button:focus-visible {
+
+            outline:
+                3px solid
+                rgba(
+                    21,
+                    101,
+                    192,
+                    0.25
+                );
+
+            outline-offset: 2px;
+
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+        ================================================= */
+
+        .empty {
+
+            background:
+                #ffffff;
+
+            padding: 35px;
+
+            text-align: center;
+
+            border:
+                1px solid #e1e5ec;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px
+                rgba(
+                    15,
+                    23,
+                    42,
+                    0.05
+                );
+
+        }
+
+
+        .empty h3 {
+
+            margin:
+                0 0 8px;
+
+            color:
+                #172033;
+
+        }
+
+
+        .empty p {
+
+            margin: 0;
+
+            color:
+                #64748b;
+
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+        ================================================= */
+
+        @media (max-width: 1050px) {
+
+            .report-grid {
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(
+                            0,
+                            1fr
+                        )
+                    );
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .reports-page {
+
+                width:
+                    calc(
+                        100% - 32px
+                    );
+
+                margin-top: 28px;
+
+            }
+
+
+            .reports-header h1 {
+
+                font-size: 30px;
+
+            }
+
+
+            .report-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .reports-page {
+
+                width:
+                    calc(
+                        100% - 24px
+                    );
+
+            }
+
+
+            .report-card {
+
+                padding: 18px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         COMMON NAVIGATION
+    ====================================================== -->
+
+    <header class="top-navbar">
+
+        <div class="nav-container">
+
+
+            <!-- BRAND -->
+
+            <a
+                href="{{ url_for(
+                    'main.dashboard'
+                ) }}"
+                class="brand"
+            >
+
+                <span class="brand-icon">
+                    ◆
+                </span>
+
+                <span>
+                    Analytics
+                    <strong>Dashboard</strong>
+                </span>
+
+            </a>
+
+
+            <!-- NAVIGATION -->
+
+            <nav class="main-navigation">
+
+
+                <!-- DASHBOARD -->
+
+                <a
+                    href="{{ url_for(
+                        'main.dashboard'
+                    ) }}"
+                    class="nav-link
+                    {% if request.endpoint == 'main.dashboard' %}
+                        active
+                    {% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    Dashboard
+
+                </a>
+
+
+                <!-- UPLOAD DATA -->
+
+                <a
+                    href="{{ url_for(
+                        'main.upload'
+                    ) }}"
+                    class="nav-link
+                    {% if request.endpoint == 'main.upload' %}
+                        active
+                    {% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        ↑
+                    </span>
+
+                    Upload Data
+
+                </a>
+
+
+                <!-- DATASETS -->
+
+                <a
+                    href="{{ url_for(
+                        'main.datasets'
+                    ) }}"
+                    class="nav-link
+                    {% if request.endpoint == 'main.datasets' %}
+                        active
+                    {% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        ▦
+                    </span>
+
+                    Datasets
+
+                </a>
+
+
+                <!-- REPORTS -->
+
+                <a
+                    href="{{ url_for(
+                        'main.reports'
+                    ) }}"
+                    class="nav-link
+                    {% if request.endpoint in [
+                        'main.reports',
+                        'main.report'
+                    ] %}
+                        active
+                    {% endif %}"
+                >
+
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    Reports
+
+                </a>
+
+
+                <!--
+                    No Info button here.
+
+                    The Info drawer belongs to the main
+                    analytics dashboard. This keeps the
+                    existing behavior unchanged.
+                -->
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         REPORT CONTENT
+    ====================================================== -->
+
+    <main class="reports-page">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="reports-header">
+
+            <h1>
+                Reports
+            </h1>
+
+            <p>
+                Select a processed dataset to view
+                a detailed business report.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             PROCESSED DATASETS
+        ================================================== -->
+
+        {% if datasets %}
+
+
+            <div class="report-grid">
+
+
+                {% for dataset in datasets %}
+
+
+                    <div class="report-card">
+
+
+                        <!-- FILE NAME -->
+
+                        <h3>
+                            {{ dataset.file_name }}
+                        </h3>
+
+
+                        <!-- DATASET INFORMATION -->
+
+                        <div class="report-info">
+
+
+                            <div>
+                                Rows:
+                                {{ dataset.row_count }}
+                            </div>
+
+
+                            <div>
+                                Type:
+                                {{ dataset.file_type.upper() }}
+                            </div>
+
+
+                            <div>
+                                Status:
+                                {{ dataset.status }}
+                            </div>
+
+
+                            <div>
+                                Uploaded:
+                                {{ dataset.uploaded_at }}
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- VIEW REPORT -->
+
+                        <a
+                            href="{{ url_for(
+                                'main.report',
+                                dataset_id=dataset.id
+                            ) }}"
+                            class="report-button"
+                        >
+
+                            View Report
+
+                        </a>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================== -->
+
+            <div class="empty">
+
+                <h3>
+                    No processed datasets available.
+                </h3>
+
+                <p>
+                    Upload and process a dataset first.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div>
+            Flask Analytics Dashboard
+        </div>
+
+        <div>
+            Python · Flask · MySQL · Pandas
+        </div>
+
+    </footer>
+
+
+</body>
+
+</html>

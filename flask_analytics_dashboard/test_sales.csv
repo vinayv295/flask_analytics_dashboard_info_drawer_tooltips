@@ -1,0 +1,4 @@
+Order ID,Order Date,Customer Name,Category,Sales,Quantity,Profit
+1001,2025-01-01,John,Technology,1000,2,200
+1002,2025-01-02,Sarah,Furniture,500,3,50
+1003,2025-01-03,David,Office Supplies,300,5,80

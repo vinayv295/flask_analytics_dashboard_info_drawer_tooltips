@@ -1,0 +1,814 @@
+{% extends "base.html" %}
+
+{% block title %}
+Analytics Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <section class="dashboard-header">
+
+        <div>
+
+            <div class="eyebrow">
+                BUSINESS ANALYTICS
+            </div>
+
+            <h1>
+                Analytics Dashboard
+            </h1>
+
+            <p>
+                Understand your business performance
+                through interactive data, charts and insights.
+            </p>
+
+        </div>
+
+
+        <div class="dashboard-status">
+            <span class="status-dot"></span>
+            Analytics Ready
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DASHBOARD CONTROLS
+    ====================================================== -->
+
+    <section class="dashboard-section controls-section">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-kicker">
+                    DATA SELECTION
+                </div>
+
+                <h2>
+                    Dashboard Controls
+                </h2>
+
+                <p>
+                    Select a dataset and apply filters
+                    to update all analytics.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="info-button"
+                data-info="controls"
+                aria-label="Dashboard controls information"
+            >
+                i
+            </button>
+
+        </div>
+
+
+        <div class="filter-grid">
+
+            <div class="filter-field dataset-field">
+
+                <label for="datasetSelect">
+                    Dataset
+                </label>
+
+                <select id="datasetSelect">
+
+                    {% for dataset in datasets %}
+
+                        <option
+                            value="{{ dataset.id }}"
+                        >
+                            Dataset #{{ dataset.id }}
+                            — {{ dataset.file_name }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="startDate">
+                    Start Date
+                </label>
+
+                <input
+                    type="date"
+                    id="startDate"
+                >
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="endDate">
+                    End Date
+                </label>
+
+                <input
+                    type="date"
+                    id="endDate"
+                >
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="categoryFilter">
+                    Category
+                </label>
+
+                <select id="categoryFilter">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label for="regionFilter">
+                    Region
+                </label>
+
+                <select id="regionFilter">
+
+                    <option value="">
+                        All Regions
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-actions">
+
+                <button
+                    type="button"
+                    id="applyFilters"
+                    class="primary-button"
+                >
+                    Apply Filters
+                </button>
+
+                <button
+                    type="button"
+                    id="resetFilters"
+                    class="secondary-button"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ERROR
+    ====================================================== -->
+
+    <div
+        id="errorBox"
+        class="dashboard-error hidden"
+    >
+
+        <div class="error-icon">
+            !
+        </div>
+
+        <div>
+
+            <strong>
+                Dashboard Error
+            </strong>
+
+            <p id="errorMessage">
+                Something went wrong.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOADING
+    ====================================================== -->
+
+    <div
+        id="loading"
+        class="dashboard-loading hidden"
+    >
+        <div class="spinner"></div>
+
+        <span>
+            Loading dashboard analytics...
+        </span>
+    </div>
+
+
+    <!-- =====================================================
+         KPI SECTION
+    ====================================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-kicker">
+                    OVERVIEW
+                </div>
+
+                <h2>
+                    Key Performance Indicators
+                </h2>
+
+                <p>
+                    High-level metrics calculated from the
+                    selected dataset and filters.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="info-button"
+                data-info="kpis"
+            >
+                i
+            </button>
+
+        </div>
+
+
+        <div class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Total Sales
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="total_sales"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="totalSales"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Total revenue
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Total Profit
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="total_profit"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="totalProfit"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Net profit
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Total Orders
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="total_orders"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="totalOrders"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Unique orders
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Units Sold
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="units_sold"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="unitsSold"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Products sold
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Profit Margin
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="profit_margin"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="profitMargin"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Profit as percentage of sales
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Average Order Value
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="average_order_value"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="averageOrderValue"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Average revenue per order
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-top">
+                    <span>
+                        Average Discount
+                    </span>
+
+                    <button
+                        class="small-info-button"
+                        data-info="average_discount"
+                    >
+                        i
+                    </button>
+                </div>
+
+                <div
+                    id="averageDiscount"
+                    class="kpi-value"
+                >
+                    —
+                </div>
+
+                <div class="kpi-description">
+                    Average discount rate
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CHARTS
+    ====================================================== -->
+
+    <div class="chart-grid">
+
+
+        <!-- MONTHLY -->
+
+        <section class="dashboard-section chart-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <div class="section-kicker">
+                        TREND
+                    </div>
+
+                    <h2>
+                        Monthly Sales Trend
+                    </h2>
+
+                    <p>
+                        Sales and profit over time.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="info-button"
+                    data-info="monthly"
+                >
+                    i
+                </button>
+
+            </div>
+
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+
+        </section>
+
+
+        <!-- CATEGORY -->
+
+        <section class="dashboard-section chart-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <div class="section-kicker">
+                        CATEGORY
+                    </div>
+
+                    <h2>
+                        Sales by Category
+                    </h2>
+
+                    <p>
+                        Revenue distribution by category.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="info-button"
+                    data-info="category"
+                >
+                    i
+                </button>
+
+            </div>
+
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+        </section>
+
+
+        <!-- REGION -->
+
+        <section
+            class="dashboard-section chart-section"
+            id="regionSection"
+        >
+
+            <div class="section-heading">
+
+                <div>
+                    <div class="section-kicker">
+                        GEOGRAPHY
+                    </div>
+
+                    <h2>
+                        Sales by Region
+                    </h2>
+
+                    <p>
+                        Revenue performance by region.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="info-button"
+                    data-info="region"
+                >
+                    i
+                </button>
+
+            </div>
+
+            <div
+                id="noRegion"
+                class="empty-state hidden"
+            >
+                No region data is available.
+            </div>
+
+            <div class="chart-container">
+                <canvas id="regionChart"></canvas>
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         PRODUCTS
+    ====================================================== -->
+
+    <div class="table-grid">
+
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <div class="section-kicker">
+                        PRODUCTS
+                    </div>
+
+                    <h2>
+                        Top Products
+                    </h2>
+
+                    <p>
+                        Products ranked by sales.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="info-button"
+                    data-info="top_products"
+                >
+                    i
+                </button>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Sales</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="topProducts">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <div class="section-kicker">
+                        PRODUCTS
+                    </div>
+
+                    <h2>
+                        Bottom Products
+                    </h2>
+
+                    <p>
+                        Products with the lowest sales.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="info-button"
+                    data-info="bottom_products"
+                >
+                    i
+                </button>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Sales</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="bottomProducts">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         INSIGHTS
+    ====================================================== -->
+
+    <section class="dashboard-section insights-section">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-kicker">
+                    INTELLIGENCE
+                </div>
+
+                <h2>
+                    Automatic Insights
+                </h2>
+
+                <p>
+                    Automatically generated observations
+                    from the selected data.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="info-button"
+                data-info="insights"
+            >
+                i
+            </button>
+
+        </div>
+
+
+        <div
+            id="insights"
+            class="insights-list"
+        >
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =========================================================
+     DASHBOARD INFORMATION DRAWER
+========================================================= -->
+
+<aside
+    id="infoDrawer"
+    class="info-drawer"
+    aria-hidden="true"
+    aria-labelledby="infoDrawerTitle"
+>
+    <div class="info-drawer-header">
+
+        <div>
+            <div class="section-kicker">
+                DASHBOARD GUIDE
+            </div>
+
+            <h2 id="infoDrawerTitle">
+                Calculations &amp; UI Guide
+            </h2>
+
+            <p>
+                Formulas, source columns, cleaning rules and
+                explanations for every dashboard component.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            id="closeInfoDrawer"
+            class="drawer-close"
+            aria-label="Close dashboard information"
+        >
+            ×
+        </button>
+
+    </div>
+
+    <div
+        id="infoDrawerBody"
+        class="info-drawer-body"
+    >
+    </div>
+</aside>
+
+<div
+    id="infoDrawerBackdrop"
+    class="info-drawer-backdrop hidden"
+    aria-hidden="true"
+></div>
+
+{% endblock %}
