@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -14,18 +15,271 @@
         {% endblock %}
     </title>
 
+
+    <!-- =====================================================
+         MAIN CSS
+    ====================================================== -->
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
 
-    <!-- Chart.js -->
+
+    <!-- =====================================================
+         DATATABLES CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"
+    >
+
+
+    <!-- =====================================================
+         DATATABLES RESPONSIVE CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"
+    >
+
+
+    <!-- =====================================================
+         DATATABLES CUSTOM STYLE
+    ====================================================== -->
+
+    <style>
+
+        /*
+         * ==================================================
+         * DataTables wrapper
+         * ==================================================
+         */
+
+        .dataTables_wrapper {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+
+        /*
+         * ==================================================
+         * Top controls
+         * ==================================================
+         */
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+
+        /*
+         * ==================================================
+         * Search box
+         * ==================================================
+         */
+
+        .dataTables_wrapper .dataTables_filter input {
+            min-width: 220px;
+            padding: 9px 12px;
+            border: 1px solid #d8dee8;
+            border-radius: 8px;
+            outline: none;
+            background: #ffffff;
+            font-size: 14px;
+        }
+
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
+        }
+
+
+        /*
+         * ==================================================
+         * Entries dropdown
+         * ==================================================
+         */
+
+        .dataTables_wrapper .dataTables_length select {
+            padding: 8px 30px 8px 10px;
+            border: 1px solid #d8dee8;
+            border-radius: 8px;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+
+        /*
+         * ==================================================
+         * DataTable
+         * ==================================================
+         */
+
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+
+
+        table.dataTable thead th {
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+
+        table.dataTable tbody td {
+            vertical-align: middle;
+        }
+
+
+        /*
+         * ==================================================
+         * Pagination
+         * ==================================================
+         */
+
+        .dataTables_wrapper .dataTables_paginate {
+            margin-top: 15px;
+        }
+
+
+        .dataTables_wrapper
+        .dataTables_paginate
+        .paginate_button {
+            border-radius: 7px !important;
+            margin-left: 3px !important;
+            padding: 6px 11px !important;
+        }
+
+
+        /*
+         * ==================================================
+         * Information text
+         * ==================================================
+         */
+
+        .dataTables_wrapper .dataTables_info {
+            padding-top: 10px;
+            color: #6b7280;
+        }
+
+
+        /*
+         * ==================================================
+         * Empty table message
+         * ==================================================
+         */
+
+        table.dataTable tbody td.dataTables_empty {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+
+        /*
+         * ==================================================
+         * Responsive table container
+         * ==================================================
+         */
+
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+
+        /*
+         * ==================================================
+         * Responsive controls
+         * ==================================================
+         */
+
+        @media (max-width: 768px) {
+
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+
+                float: none !important;
+                text-align: left !important;
+                width: 100%;
+                margin-bottom: 10px;
+
+            }
+
+
+            .dataTables_wrapper
+            .dataTables_filter
+            input {
+
+                width: 100%;
+                min-width: 0;
+
+            }
+
+
+            .dataTables_wrapper
+            .dataTables_paginate {
+
+                float: none !important;
+                text-align: left !important;
+                margin-top: 15px;
+
+            }
+
+        }
+
+    </style>
+
+
+    <!-- =====================================================
+         JQUERY
+    ====================================================== -->
+
+    <script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+    ></script>
+
+
+    <!-- =====================================================
+         DATATABLES JS
+    ====================================================== -->
+
+    <script
+        src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"
+    ></script>
+
+
+    <!-- =====================================================
+         DATATABLES RESPONSIVE JS
+    ====================================================== -->
+
+    <script
+        src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"
+    ></script>
+
+
+    <!-- =====================================================
+         CHART.JS
+    ====================================================== -->
+
     <script
         src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
     ></script>
+
 </head>
 
+
 <body>
+
 
     <!-- =====================================================
          NAVIGATION
@@ -35,20 +289,40 @@
 
         <div class="nav-container">
 
+
+            <!-- =================================================
+                 BRAND
+            ================================================== -->
+
             <a
                 href="{{ url_for('main.dashboard') }}"
                 class="brand"
             >
-                <span class="brand-icon">◆</span>
+
+                <span class="brand-icon">
+                    ◆
+                </span>
 
                 <span>
                     Analytics
-                    <strong>Dashboard</strong>
+                    <strong>
+                        Dashboard
+                    </strong>
                 </span>
+
             </a>
 
 
+            <!-- =================================================
+                 NAVIGATION
+            ================================================== -->
+
             <nav class="main-navigation">
+
+
+                <!-- =================================================
+                     DASHBOARD
+                ================================================== -->
 
                 <a
                     href="{{ url_for('main.dashboard') }}"
@@ -57,9 +331,19 @@
                     active
                     {% endif %}"
                 >
-                    <span class="nav-icon">⌂</span>
+
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
                     Dashboard
+
                 </a>
+
+
+                <!-- =================================================
+                     UPLOAD
+                ================================================== -->
 
                 <a
                     href="{{ url_for('main.upload') }}"
@@ -68,9 +352,19 @@
                     active
                     {% endif %}"
                 >
-                    <span class="nav-icon">↑</span>
+
+                    <span class="nav-icon">
+                        ↑
+                    </span>
+
                     Upload Data
+
                 </a>
+
+
+                <!-- =================================================
+                     DATASETS
+                ================================================== -->
 
                 <a
                     href="{{ url_for('main.datasets') }}"
@@ -79,9 +373,19 @@
                     active
                     {% endif %}"
                 >
-                    <span class="nav-icon">▦</span>
+
+                    <span class="nav-icon">
+                        ▦
+                    </span>
+
                     Datasets
+
                 </a>
+
+
+                <!-- =================================================
+                     REPORTS
+                ================================================== -->
 
                 <a
                     href="{{ url_for('main.reports') }}"
@@ -90,11 +394,22 @@
                     active
                     {% endif %}"
                 >
-                    <span class="nav-icon">▤</span>
+
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
                     Reports
+
                 </a>
 
+
+                <!-- =================================================
+                     DASHBOARD INFO
+                ================================================== -->
+
                 {% if request.endpoint == 'main.dashboard' %}
+
                 <button
                     type="button"
                     id="dashboardInfoButton"
@@ -102,10 +417,17 @@
                     aria-label="Open dashboard calculation and UI information"
                     title="Dashboard calculations & UI information"
                 >
-                    <span class="nav-icon">ⓘ</span>
+
+                    <span class="nav-icon">
+                        ⓘ
+                    </span>
+
                     Info
+
                 </button>
+
                 {% endif %}
+
 
             </nav>
 
@@ -132,7 +454,9 @@
                         class="flash-message
                         flash-{{ category }}"
                     >
+
                         {{ message }}
+
                     </div>
 
                 {% endfor %}
@@ -151,6 +475,7 @@
     <main class="page-container">
 
         {% block content %}
+
         {% endblock %}
 
     </main>
@@ -173,9 +498,23 @@
     </footer>
 
 
+    <!-- =====================================================
+         TABLES / DATATABLES
+    ====================================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/tables.js') }}"
+    ></script>
+
+
+    <!-- =====================================================
+         DASHBOARD JS
+    ====================================================== -->
+
     <script
         src="{{ url_for('static', filename='js/dashboard.js') }}"
     ></script>
+
 
 </body>
 </html>

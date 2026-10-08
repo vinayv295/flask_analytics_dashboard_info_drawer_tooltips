@@ -2,6 +2,10 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        // =====================================================
+        // DOM ELEMENTS
+        // =====================================================
+
         const datasetSelect =
             document.getElementById(
                 "datasetSelect"
@@ -53,16 +57,48 @@ document.addEventListener(
             );
 
 
+        // =====================================================
+        // CHART INSTANCES
+        // =====================================================
+
         let monthlyChart = null;
+
         let categoryChart = null;
+
         let regionChart = null;
+
+
+        // =====================================================
+        // SAFETY
+        // =====================================================
+
+        /*
+         * dashboard.js is loaded by the common base template.
+         * If the current page is not the dashboard page,
+         * dashboard-specific elements may not exist.
+         */
+
+        if (
+            !datasetSelect ||
+            !startDate ||
+            !endDate ||
+            !categoryFilter ||
+            !regionFilter
+        ) {
+            /*
+             * The Info drawer is handled separately below,
+             * so do not stop the entire script here.
+             */
+        }
 
 
         // =====================================================
         // HELPERS
         // =====================================================
 
-        function escapeHtml(value) {
+        function escapeHtml(
+            value
+        ) {
 
             return String(
                 value ?? ""
@@ -90,10 +126,14 @@ document.addEventListener(
         }
 
 
-        function formatCurrency(value) {
+        function formatCurrency(
+            value
+        ) {
 
             const number =
-                Number(value || 0);
+                Number(
+                    value || 0
+                );
 
             return "₹" +
                 number.toLocaleString(
@@ -106,7 +146,9 @@ document.addEventListener(
         }
 
 
-        function formatNumber(value) {
+        function formatNumber(
+            value
+        ) {
 
             return Number(
                 value || 0
@@ -118,17 +160,28 @@ document.addEventListener(
 
         function showLoading() {
 
+            if (!loading) {
+                return;
+            }
+
             loading.classList.remove(
                 "hidden"
             );
 
-            errorBox.classList.add(
-                "hidden"
-            );
+            if (errorBox) {
+
+                errorBox.classList.add(
+                    "hidden"
+                );
+            }
         }
 
 
         function hideLoading() {
+
+            if (!loading) {
+                return;
+            }
 
             loading.classList.add(
                 "hidden"
@@ -136,20 +189,32 @@ document.addEventListener(
         }
 
 
-        function showError(message) {
+        function showError(
+            message
+        ) {
 
             hideLoading();
 
-            errorMessage.textContent =
-                message;
+            if (errorMessage) {
 
-            errorBox.classList.remove(
-                "hidden"
-            );
+                errorMessage.textContent =
+                    message;
+            }
+
+            if (errorBox) {
+
+                errorBox.classList.remove(
+                    "hidden"
+                );
+            }
         }
 
 
         function hideError() {
+
+            if (!errorBox) {
+                return;
+            }
 
             errorBox.classList.add(
                 "hidden"
@@ -166,14 +231,20 @@ document.addEventListener(
         ) {
 
             const response =
-                await fetch(url);
+                await fetch(
+                    url
+                );
 
             let payload = null;
 
+
             try {
+
                 payload =
                     await response.json();
+
             } catch (error) {
+
                 throw new Error(
                     `Invalid JSON response from ${url}`
                 );
@@ -197,7 +268,21 @@ document.addEventListener(
         }
 
 
+        // =====================================================
+        // BUILD FILTER QUERY
+        // =====================================================
+
         function buildQueryString() {
+
+            if (
+                !startDate ||
+                !endDate ||
+                !categoryFilter ||
+                !regionFilter
+            ) {
+                return "";
+            }
+
 
             const params =
                 new URLSearchParams();
@@ -206,38 +291,48 @@ document.addEventListener(
             const start =
                 startDate.value;
 
+
             const end =
                 endDate.value;
 
+
             const category =
                 categoryFilter.value;
+
 
             const region =
                 regionFilter.value;
 
 
             if (start) {
+
                 params.set(
                     "start_date",
                     start
                 );
             }
 
+
             if (end) {
+
                 params.set(
                     "end_date",
                     end
                 );
             }
 
+
             if (category) {
+
                 params.set(
                     "category",
                     category
                 );
             }
 
+
             if (region) {
+
                 params.set(
                     "region",
                     region
@@ -247,6 +342,7 @@ document.addEventListener(
 
             const query =
                 params.toString();
+
 
             return query
                 ? `?${query}`
@@ -260,8 +356,14 @@ document.addEventListener(
 
         async function loadFilterOptions() {
 
+            if (!datasetSelect) {
+                return;
+            }
+
+
             const datasetId =
                 datasetSelect.value;
+
 
             if (!datasetId) {
                 return;
@@ -275,59 +377,71 @@ document.addEventListener(
 
 
             categoryFilter.innerHTML =
-                `<option value="">
+                `
+                <option value="">
                     All Categories
-                </option>`;
+                </option>
+                `;
 
 
             regionFilter.innerHTML =
-                `<option value="">
+                `
+                <option value="">
                     All Regions
-                </option>`;
+                </option>
+                `;
 
 
-            (data.categories || [])
-                .forEach(
-                    category => {
+            (
+                data.categories || []
+            ).forEach(
+                category => {
 
-                        const option =
-                            document.createElement(
-                                "option"
-                            );
-
-                        option.value =
-                            category;
-
-                        option.textContent =
-                            category;
-
-                        categoryFilter.appendChild(
-                            option
+                    const option =
+                        document.createElement(
+                            "option"
                         );
-                    }
-                );
 
 
-            (data.regions || [])
-                .forEach(
-                    region => {
+                    option.value =
+                        category;
 
-                        const option =
-                            document.createElement(
-                                "option"
-                            );
 
-                        option.value =
-                            region;
+                    option.textContent =
+                        category;
 
-                        option.textContent =
-                            region;
 
-                        regionFilter.appendChild(
-                            option
+                    categoryFilter.appendChild(
+                        option
+                    );
+                }
+            );
+
+
+            (
+                data.regions || []
+            ).forEach(
+                region => {
+
+                    const option =
+                        document.createElement(
+                            "option"
                         );
-                    }
-                );
+
+
+                    option.value =
+                        region;
+
+
+                    option.textContent =
+                        region;
+
+
+                    regionFilter.appendChild(
+                        option
+                    );
+                }
+            );
         }
 
 
@@ -338,17 +452,25 @@ document.addEventListener(
         function destroyCharts() {
 
             if (monthlyChart) {
+
                 monthlyChart.destroy();
+
                 monthlyChart = null;
             }
 
+
             if (categoryChart) {
+
                 categoryChart.destroy();
+
                 categoryChart = null;
             }
 
+
             if (regionChart) {
+
                 regionChart.destroy();
+
                 regionChart = null;
             }
         }
@@ -376,7 +498,9 @@ document.addEventListener(
                     },
 
                     tooltip: {
+
                         mode: "index",
+
                         intersect: false
                     }
                 },
@@ -397,11 +521,13 @@ document.addEventListener(
                         beginAtZero: true,
 
                         grid: {
+
                             color:
                                 "rgba(15, 23, 42, 0.08)"
                         },
 
                         ticks: {
+
                             maxTicksLimit: 7
                         }
                     }
@@ -423,6 +549,7 @@ document.addEventListener(
                     "monthlyChart"
                 );
 
+
             if (!canvas) {
                 return;
             }
@@ -432,6 +559,7 @@ document.addEventListener(
                 new Chart(
                     canvas,
                     {
+
                         type: "line",
 
                         data: {
@@ -445,6 +573,7 @@ document.addEventListener(
                             datasets: [
 
                                 {
+
                                     label:
                                         "Sales",
 
@@ -474,6 +603,7 @@ document.addEventListener(
                                 },
 
                                 {
+
                                     label:
                                         "Profit",
 
@@ -522,6 +652,7 @@ document.addEventListener(
                     "categoryChart"
                 );
 
+
             if (!canvas) {
                 return;
             }
@@ -531,6 +662,7 @@ document.addEventListener(
                 new Chart(
                     canvas,
                     {
+
                         type: "bar",
 
                         data: {
@@ -544,6 +676,7 @@ document.addEventListener(
                             datasets: [
 
                                 {
+
                                     label:
                                         "Sales",
 
@@ -562,6 +695,7 @@ document.addEventListener(
                                 },
 
                                 {
+
                                     label:
                                         "Profit",
 
@@ -602,6 +736,7 @@ document.addEventListener(
                     "regionChart"
                 );
 
+
             const noRegion =
                 document.getElementById(
                     "noRegion"
@@ -615,20 +750,29 @@ document.addEventListener(
 
             if (!data.length) {
 
-                noRegion.classList.remove(
-                    "hidden"
-                );
+                if (noRegion) {
+
+                    noRegion.classList.remove(
+                        "hidden"
+                    );
+                }
+
 
                 canvas.style.display =
                     "none";
+
 
                 return;
             }
 
 
-            noRegion.classList.add(
-                "hidden"
-            );
+            if (noRegion) {
+
+                noRegion.classList.add(
+                    "hidden"
+                );
+            }
+
 
             canvas.style.display =
                 "block";
@@ -638,6 +782,7 @@ document.addEventListener(
                 new Chart(
                     canvas,
                     {
+
                         type: "bar",
 
                         data: {
@@ -651,6 +796,7 @@ document.addEventListener(
                             datasets: [
 
                                 {
+
                                     label:
                                         "Sales",
 
@@ -669,6 +815,7 @@ document.addEventListener(
                                 },
 
                                 {
+
                                     label:
                                         "Profit",
 
@@ -700,62 +847,113 @@ document.addEventListener(
         // KPI RENDER
         // =====================================================
 
-        function renderKpis(data) {
+        function renderKpis(
+            data
+        ) {
 
-            document.getElementById(
-                "totalSales"
-            ).textContent =
-                formatCurrency(
-                    data.total_sales
+            const totalSales =
+                document.getElementById(
+                    "totalSales"
                 );
 
 
-            document.getElementById(
-                "totalProfit"
-            ).textContent =
-                formatCurrency(
-                    data.total_profit
+            const totalProfit =
+                document.getElementById(
+                    "totalProfit"
                 );
 
 
-            document.getElementById(
-                "totalOrders"
-            ).textContent =
-                formatNumber(
-                    data.total_orders
+            const totalOrders =
+                document.getElementById(
+                    "totalOrders"
                 );
 
 
-            document.getElementById(
-                "unitsSold"
-            ).textContent =
-                formatNumber(
-                    data.units_sold
+            const unitsSold =
+                document.getElementById(
+                    "unitsSold"
                 );
 
 
-            document.getElementById(
-                "profitMargin"
-            ).textContent =
-                `${Number(
-                    data.profit_margin || 0
-                ).toFixed(2)}%`;
-
-
-            document.getElementById(
-                "averageOrderValue"
-            ).textContent =
-                formatCurrency(
-                    data.average_order_value
+            const profitMargin =
+                document.getElementById(
+                    "profitMargin"
                 );
 
 
-            document.getElementById(
-                "averageDiscount"
-            ).textContent =
-                `${Number(
-                    data.average_discount || 0
-                ).toFixed(2)}`;
+            const averageOrderValue =
+                document.getElementById(
+                    "averageOrderValue"
+                );
+
+
+            const averageDiscount =
+                document.getElementById(
+                    "averageDiscount"
+                );
+
+
+            if (totalSales) {
+
+                totalSales.textContent =
+                    formatCurrency(
+                        data.total_sales
+                    );
+            }
+
+
+            if (totalProfit) {
+
+                totalProfit.textContent =
+                    formatCurrency(
+                        data.total_profit
+                    );
+            }
+
+
+            if (totalOrders) {
+
+                totalOrders.textContent =
+                    formatNumber(
+                        data.total_orders
+                    );
+            }
+
+
+            if (unitsSold) {
+
+                unitsSold.textContent =
+                    formatNumber(
+                        data.units_sold
+                    );
+            }
+
+
+            if (profitMargin) {
+
+                profitMargin.textContent =
+                    `${Number(
+                        data.profit_margin || 0
+                    ).toFixed(2)}%`;
+            }
+
+
+            if (averageOrderValue) {
+
+                averageOrderValue.textContent =
+                    formatCurrency(
+                        data.average_order_value
+                    );
+            }
+
+
+            if (averageDiscount) {
+
+                averageDiscount.textContent =
+                    `${Number(
+                        data.average_discount || 0
+                    ).toFixed(2)}`;
+            }
         }
 
 
@@ -774,18 +972,14 @@ document.addEventListener(
                 );
 
 
+            if (!tbody) {
+                return;
+            }
+
+
             if (!products.length) {
 
-                tbody.innerHTML = `
-                    <tr>
-                        <td
-                            colspan="3"
-                            class="empty-table"
-                        >
-                            No product data available.
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = "";
 
                 return;
             }
@@ -834,13 +1028,21 @@ document.addEventListener(
                 );
 
 
+            if (!container) {
+                return;
+            }
+
+
             if (!insights.length) {
 
-                container.innerHTML = `
+                container.innerHTML =
+                    `
                     <div class="empty-state">
+
                         No automatic insights are available.
+
                     </div>
-                `;
+                    `;
 
                 return;
             }
@@ -848,7 +1050,9 @@ document.addEventListener(
 
             container.innerHTML =
                 insights.map(
-                    insight => `
+                    insight =>
+
+                        `
                         <div class="insight-item">
 
                             <div class="insight-number">
@@ -856,13 +1060,15 @@ document.addEventListener(
                             </div>
 
                             <div>
+
                                 ${escapeHtml(
                                     insight
                                 )}
+
                             </div>
 
                         </div>
-                    `
+                        `
                 ).join("");
         }
 
@@ -872,6 +1078,11 @@ document.addEventListener(
         // =====================================================
 
         async function loadDashboard() {
+
+            if (!datasetSelect) {
+                return;
+            }
+
 
             const datasetId =
                 datasetSelect.value;
@@ -883,6 +1094,7 @@ document.addEventListener(
 
 
             showLoading();
+
             hideError();
 
             destroyCharts();
@@ -895,13 +1107,21 @@ document.addEventListener(
             try {
 
                 const [
+
                     kpis,
+
                     monthly,
+
                     categories,
+
                     regions,
+
                     topProducts,
+
                     bottomProducts,
+
                     insights
+
                 ] = await Promise.all([
 
                     apiRequest(
@@ -939,27 +1159,33 @@ document.addEventListener(
                     kpis
                 );
 
+
                 renderMonthlyChart(
                     monthly || []
                 );
+
 
                 renderCategoryChart(
                     categories || []
                 );
 
+
                 renderRegionChart(
                     regions || []
                 );
+
 
                 renderProductTable(
                     "topProducts",
                     topProducts || []
                 );
 
+
                 renderProductTable(
                     "bottomProducts",
                     bottomProducts || []
                 );
+
 
                 renderInsights(
                     insights || []
@@ -973,10 +1199,12 @@ document.addEventListener(
                     error
                 );
 
+
                 showError(
                     error.message ||
                     "Could not load dashboard data."
                 );
+
 
             } finally {
 
@@ -989,209 +1217,33 @@ document.addEventListener(
         // INFO DRAWER
         // =====================================================
 
-        const dashboardInfoButton =
+        const infoButton =
             document.getElementById(
                 "dashboardInfoButton"
             );
 
+
         const infoDrawer =
             document.getElementById(
-                "infoDrawer"
+                "dashboardInfoDrawer"
             );
 
-        const infoDrawerBody =
+
+        const infoOverlay =
             document.getElementById(
-                "infoDrawerBody"
+                "infoDrawerOverlay"
             );
 
-        const closeInfoDrawer =
+
+        const infoClose =
             document.getElementById(
-                "closeInfoDrawer"
-            );
-
-        const infoDrawerBackdrop =
-            document.getElementById(
-                "infoDrawerBackdrop"
+                "infoDrawerClose"
             );
 
 
-        const infoContent = {
-
-            controls: {
-                title: "Dashboard Controls",
-                description: "These controls determine which dataset and records are used for the dashboard calculations.",
-                formula: "The selected filters are applied to dataset records before calculating KPIs, charts and tables.",
-                columns: "Dataset ID, Order Date, Category, Region",
-                cleaning: "Column names are normalized, duplicate rows are removed, date fields are converted to dates, numeric fields are converted to numeric values, and missing values are detected."
-            },
-
-            kpis: {
-                title: "Key Performance Indicators",
-                description: "KPIs summarize the overall performance of the selected dataset.",
-                formula: "Sales = SUM(Sales). Profit = SUM(Profit). Orders = COUNT(DISTINCT Order ID). Units = SUM(Quantity).",
-                columns: "Sales, Profit, Order ID, Quantity, Discount",
-                cleaning: "Sales, Quantity, Discount and Profit are converted to numeric values. Duplicate rows are removed before storage."
-            },
-
-            total_sales: {
-                title: "Total Sales",
-                description: "Total revenue generated by all selected records.",
-                formula: "Total Sales = SUM(Sales)",
-                columns: "Sales",
-                cleaning: "Sales values are converted to numeric values. Invalid numeric values become missing values and are not treated as valid sales."
-            },
-
-            total_profit: {
-                title: "Total Profit",
-                description: "Total profit generated by the selected records.",
-                formula: "Total Profit = SUM(Profit)",
-                columns: "Profit",
-                cleaning: "Profit is converted to numeric values during dataset cleaning."
-            },
-
-            total_orders: {
-                title: "Total Orders",
-                description: "Number of unique orders in the selected data.",
-                formula: "Total Orders = COUNT(DISTINCT Order ID)",
-                columns: "Order ID",
-                cleaning: "Duplicate rows are removed before analytics are performed."
-            },
-
-            units_sold: {
-                title: "Units Sold",
-                description: "Total quantity of products sold.",
-                formula: "Units Sold = SUM(Quantity)",
-                columns: "Quantity",
-                cleaning: "Quantity is converted to a numeric value."
-            },
-
-            profit_margin: {
-                title: "Profit Margin",
-                description: "Shows how much of sales remains as profit.",
-                formula: "Profit Margin = (Total Profit / Total Sales) × 100",
-                columns: "Profit, Sales",
-                cleaning: "Sales and Profit are converted to numeric values."
-            },
-
-            average_order_value: {
-                title: "Average Order Value",
-                description: "Average revenue generated per unique order.",
-                formula: "Average Order Value = Total Sales / Total Orders",
-                columns: "Sales, Order ID",
-                cleaning: "Sales is converted to numeric values and duplicate records are removed."
-            },
-
-            average_discount: {
-                title: "Average Discount",
-                description: "Average discount value across selected records.",
-                formula: "Average Discount = AVG(Discount)",
-                columns: "Discount",
-                cleaning: "Discount values are converted to numeric values."
-            },
-
-            monthly: {
-                title: "Monthly Sales Trend",
-                description: "Shows sales and profit grouped by month.",
-                formula: "Monthly Sales = SUM(Sales) grouped by Order Date month.",
-                columns: "Order Date, Sales, Profit",
-                cleaning: "Order Date is converted to a date/datetime value. Sales and Profit are converted to numeric values."
-            },
-
-            category: {
-                title: "Sales by Category",
-                description: "Compares revenue and profit across product categories.",
-                formula: "Category Sales = SUM(Sales) grouped by Category.",
-                columns: "Category, Sales, Profit",
-                cleaning: "Category names are normalized and numeric values are converted."
-            },
-
-            region: {
-                title: "Sales by Region",
-                description: "Compares sales and profit across geographic regions.",
-                formula: "Region Sales = SUM(Sales) grouped by Region.",
-                columns: "Region, Sales, Profit",
-                cleaning: "Region values are cleaned and sales/profit are converted to numeric values."
-            },
-
-            top_products: {
-                title: "Top Products",
-                description: "Products ranked from highest to lowest by sales.",
-                formula: "Product Sales = SUM(Sales) grouped by Product Name, ordered descending.",
-                columns: "Product Name, Sales, Profit",
-                cleaning: "Product names are normalized and numeric sales/profit values are converted."
-            },
-
-            bottom_products: {
-                title: "Bottom Products",
-                description: "Products ranked from lowest to highest by sales.",
-                formula: "Product Sales = SUM(Sales) grouped by Product Name, ordered ascending.",
-                columns: "Product Name, Sales, Profit",
-                cleaning: "Product names are normalized and numeric sales/profit values are converted."
-            },
-
-            insights: {
-                title: "Automatic Insights",
-                description: "These observations are generated automatically from the dashboard analytics.",
-                formula: "Insights use KPI, category and monthly analytics to identify totals, margins, strongest categories and best sales months.",
-                columns: "Sales, Profit, Order ID, Quantity, Category, Order Date",
-                cleaning: "The same cleaned dataset used by the dashboard analytics is used for automatic insights."
-            }
-
-        };
-
-
-        function renderInfoDrawer() {
-
-            if (!infoDrawerBody) {
-                return;
-            }
-
-            infoDrawerBody.innerHTML =
-                Object.keys(infoContent)
-                    .map(
-                        key => {
-
-                            const info =
-                                infoContent[key];
-
-                            return `
-                                <section class="drawer-info-card">
-                                    <div class="drawer-info-title">
-                                        <span>${escapeHtml(info.title)}</span>
-                                        <span class="drawer-info-key">
-                                            ${escapeHtml(key.replaceAll("_", " "))}
-                                        </span>
-                                    </div>
-
-                                    <div class="drawer-info-row">
-                                        <strong>What it means</strong>
-                                        <p>${escapeHtml(info.description)}</p>
-                                    </div>
-
-                                    <div class="drawer-info-row">
-                                        <strong>Calculation / Formula</strong>
-                                        <div class="formula-box">
-                                            ${escapeHtml(info.formula)}
-                                        </div>
-                                    </div>
-
-                                    <div class="drawer-info-row">
-                                        <strong>Source Columns</strong>
-                                        <p>${escapeHtml(info.columns)}</p>
-                                    </div>
-
-                                    <div class="drawer-info-row">
-                                        <strong>Data Cleaning</strong>
-                                        <p>${escapeHtml(info.cleaning)}</p>
-                                    </div>
-                                </section>
-                            `;
-
-                        }
-                    )
-                    .join("");
-        }
-
+        // =====================================================
+        // OPEN INFO DRAWER
+        // =====================================================
 
         function openInfoDrawer() {
 
@@ -1199,629 +1251,202 @@ document.addEventListener(
                 return;
             }
 
-            renderInfoDrawer();
 
             infoDrawer.classList.add(
                 "open"
             );
 
-            if (infoDrawerBackdrop) {
-                infoDrawerBackdrop.classList.remove(
-                    "hidden"
+
+            if (infoOverlay) {
+
+                infoOverlay.classList.add(
+                    "open"
+                );
+
+                infoOverlay.setAttribute(
+                    "aria-hidden",
+                    "false"
                 );
             }
+
 
             infoDrawer.setAttribute(
                 "aria-hidden",
                 "false"
             );
 
-            document.body.classList.add(
-                "info-drawer-open"
-            );
 
-            if (closeInfoDrawer) {
-                closeInfoDrawer.focus();
+            if (infoButton) {
+
+                infoButton.setAttribute(
+                    "aria-expanded",
+                    "true"
+                );
+            }
+
+
+            /*
+             * Prevent the dashboard page from scrolling
+             * while the drawer is open.
+             */
+
+            document.body.style.overflow =
+                "hidden";
+
+
+            /*
+             * Put keyboard focus on close button.
+             */
+
+            if (infoClose) {
+
+                window.setTimeout(
+                    () => {
+
+                        infoClose.focus();
+
+                    },
+                    50
+                );
             }
         }
 
 
-        function closeInfoDrawerPanel() {
+        // =====================================================
+        // CLOSE INFO DRAWER
+        // =====================================================
+
+        function closeInfoDrawer() {
 
             if (!infoDrawer) {
                 return;
             }
 
+
             infoDrawer.classList.remove(
                 "open"
             );
 
-            if (infoDrawerBackdrop) {
-                infoDrawerBackdrop.classList.add(
-                    "hidden"
+
+            if (infoOverlay) {
+
+                infoOverlay.classList.remove(
+                    "open"
+                );
+
+                infoOverlay.setAttribute(
+                    "aria-hidden",
+                    "true"
                 );
             }
+
 
             infoDrawer.setAttribute(
                 "aria-hidden",
                 "true"
             );
 
-            document.body.classList.remove(
-                "info-drawer-open"
-            );
-        }
 
+            if (infoButton) {
 
-        if (dashboardInfoButton) {
-            dashboardInfoButton.addEventListener(
-                "click",
-                openInfoDrawer
-            );
-        }
-
-
-        if (closeInfoDrawer) {
-            closeInfoDrawer.addEventListener(
-                "click",
-                closeInfoDrawerPanel
-            );
-        }
-
-
-        if (infoDrawerBackdrop) {
-            infoDrawerBackdrop.addEventListener(
-                "click",
-                closeInfoDrawerPanel
-            );
-        }
-
-
-        /* =====================================================
-           RICH INFORMATION TOOLTIPS
-        ===================================================== */
-
-        let activeInfoTooltip = null;
-
-        let activeInfoButton = null;
-
-        let tooltipHideTimer = null;
-
-
-        function createInfoTooltip(key) {
-
-            const info =
-                infoContent[key];
-
-            if (!info) {
-                return null;
-            }
-
-
-            const tooltip =
-                document.createElement(
-                    "div"
+                infoButton.setAttribute(
+                    "aria-expanded",
+                    "false"
                 );
+            }
 
 
-            tooltip.className =
-                "dashboard-info-tooltip";
+            /*
+             * Restore page scrolling.
+             */
+
+            document.body.style.overflow =
+                "";
 
 
-            tooltip.setAttribute(
-                "role",
-                "tooltip"
-            );
+            /*
+             * Return focus to Info menu.
+             */
 
+            if (infoButton) {
 
-            tooltip.innerHTML = `
-
-                <div
-                    class="dashboard-info-tooltip-header"
-                >
-
-                    <h3
-                        class="dashboard-info-tooltip-title"
-                    >
-                        ${escapeHtml(
-                            info.title
-                        )}
-                    </h3>
-
-                    <span
-                        class="dashboard-info-tooltip-badge"
-                    >
-                        measured
-                    </span>
-
-                </div>
-
-
-                <div
-                    class="dashboard-info-tooltip-section"
-                >
-
-                    <div
-                        class="dashboard-info-tooltip-label"
-                    >
-                        From
-                    </div>
-
-                    <p
-                        class="dashboard-info-tooltip-value"
-                    >
-                        ${escapeHtml(
-                            info.columns
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div
-                    class="dashboard-info-tooltip-section"
-                >
-
-                    <div
-                        class="dashboard-info-tooltip-label"
-                    >
-                        Calculated as
-                    </div>
-
-                    <p
-                        class="dashboard-info-tooltip-formula"
-                    >
-                        ${escapeHtml(
-                            info.formula
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div
-                    class="dashboard-info-tooltip-section"
-                >
-
-                    <div
-                        class="dashboard-info-tooltip-label"
-                    >
-                        One row is
-                    </div>
-
-                    <p
-                        class="dashboard-info-tooltip-value"
-                    >
-                        ${escapeHtml(
-                            info.description
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div
-                    class="dashboard-info-tooltip-note"
-                >
-                    ${escapeHtml(
-                        info.cleaning
-                    )}
-                </div>
-
-
-                <button
-                    type="button"
-                    class="dashboard-info-tooltip-link"
-                    data-tooltip-open-drawer="true"
-                >
-                    See the full data flow →
-                </button>
-
-            `;
-
-
-            return tooltip;
+                infoButton.focus();
+            }
         }
 
 
-        function positionInfoTooltip() {
+        // =====================================================
+        // INFO BUTTON
+        // =====================================================
 
-            if (
-                !activeInfoTooltip ||
-                !activeInfoButton
-            ) {
-                return;
-            }
+        if (infoButton) {
 
+            infoButton.addEventListener(
+                "click",
+                event => {
 
-            const buttonRect =
-                activeInfoButton.getBoundingClientRect();
+                    event.preventDefault();
 
+                    openInfoDrawer();
 
-            const tooltipRect =
-                activeInfoTooltip.getBoundingClientRect();
-
-
-            const viewportWidth =
-                window.innerWidth;
-
-
-            const viewportHeight =
-                window.innerHeight;
-
-
-            const margin = 12;
-
-
-            let left =
-                buttonRect.right -
-                tooltipRect.width;
-
-
-            let top =
-                buttonRect.bottom +
-                10;
-
-
-            if (
-                top + tooltipRect.height >
-                viewportHeight - margin
-            ) {
-
-                top =
-                    buttonRect.top -
-                    tooltipRect.height -
-                    10;
-            }
-
-
-            if (
-                top < margin
-            ) {
-
-                top = margin;
-            }
-
-
-            if (
-                top + tooltipRect.height >
-                viewportHeight - margin
-            ) {
-
-                top =
-                    viewportHeight -
-                    tooltipRect.height -
-                    margin;
-            }
-
-
-            if (
-                left < margin
-            ) {
-
-                left = margin;
-            }
-
-
-            if (
-                left + tooltipRect.width >
-                viewportWidth - margin
-            ) {
-
-                left =
-                    viewportWidth -
-                    tooltipRect.width -
-                    margin;
-            }
-
-
-            activeInfoTooltip.style.left =
-                `${Math.max(margin, left)}px`;
-
-
-            activeInfoTooltip.style.top =
-                `${Math.max(margin, top)}px`;
-        }
-
-
-        function cancelInfoTooltipHide() {
-
-            clearTimeout(
-                tooltipHideTimer
+                }
             );
         }
 
 
-        function scheduleInfoTooltipHide() {
+        // =====================================================
+        // CLOSE BUTTON
+        // =====================================================
 
-            cancelInfoTooltipHide();
+        if (infoClose) {
 
-
-            tooltipHideTimer =
-                setTimeout(
-                    () => {
-
-                        hideInfoTooltip();
-
-                    },
-                    140
-                );
-        }
-
-
-        function showInfoTooltip(button) {
-
-            const key =
-                button.dataset.info;
-
-
-            if (
-                !key ||
-                !infoContent[key]
-            ) {
-                return;
-            }
-
-
-            cancelInfoTooltipHide();
-
-
-            if (
-                activeInfoButton === button &&
-                activeInfoTooltip
-            ) {
-
-                positionInfoTooltip();
-
-                return;
-            }
-
-
-            hideInfoTooltip();
-
-
-            const tooltip =
-                createInfoTooltip(key);
-
-
-            if (!tooltip) {
-                return;
-            }
-
-
-            document.body.appendChild(
-                tooltip
-            );
-
-
-            activeInfoTooltip =
-                tooltip;
-
-
-            activeInfoButton =
-                button;
-
-
-            requestAnimationFrame(
+            infoClose.addEventListener(
+                "click",
                 () => {
 
-                    if (
-                        !activeInfoTooltip
-                    ) {
-                        return;
-                    }
+                    closeInfoDrawer();
 
-
-                    positionInfoTooltip();
-
-
-                    activeInfoTooltip.classList.add(
-                        "is-visible"
-                    );
                 }
-            );
-
-
-            const drawerButton =
-                tooltip.querySelector(
-                    "[data-tooltip-open-drawer]"
-                );
-
-
-            if (drawerButton) {
-
-                drawerButton.addEventListener(
-                    "click",
-                    () => {
-
-                        cancelInfoTooltipHide();
-
-                        hideInfoTooltip();
-
-                        openInfoDrawer();
-                    }
-                );
-            }
-
-
-            tooltip.addEventListener(
-                "mouseenter",
-                cancelInfoTooltipHide
-            );
-
-
-            tooltip.addEventListener(
-                "mouseleave",
-                scheduleInfoTooltipHide
             );
         }
 
 
-        function hideInfoTooltip() {
+        // =====================================================
+        // OVERLAY CLICK
+        // =====================================================
 
-            cancelInfoTooltipHide();
+        if (infoOverlay) {
 
+            infoOverlay.addEventListener(
+                "click",
+                () => {
 
-            if (
-                activeInfoTooltip
-            ) {
+                    closeInfoDrawer();
 
-                activeInfoTooltip.classList.remove(
-                    "is-visible"
-                );
-
-                activeInfoTooltip.remove();
-            }
-
-
-            activeInfoTooltip =
-                null;
-
-
-            activeInfoButton =
-                null;
+                }
+            );
         }
 
 
-        document
-            .querySelectorAll(
-                "[data-info]"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "mouseenter",
-                        () => {
-
-                            showInfoTooltip(
-                                button
-                            );
-                        }
-                    );
-
-
-                    button.addEventListener(
-                        "mouseleave",
-                        () => {
-
-                            scheduleInfoTooltipHide();
-                        }
-                    );
-
-
-                    button.addEventListener(
-                        "focus",
-                        () => {
-
-                            showInfoTooltip(
-                                button
-                            );
-                        }
-                    );
-
-
-                    button.addEventListener(
-                        "blur",
-                        () => {
-
-                            scheduleInfoTooltipHide();
-                        }
-                    );
-
-
-                    button.addEventListener(
-                        "keydown",
-                        event => {
-
-                            if (
-                                event.key === "Escape"
-                            ) {
-
-                                hideInfoTooltip();
-                            }
-                        }
-                    );
-                }
-            );
-
-
-        window.addEventListener(
-            "resize",
-            () => {
-
-                if (
-                    activeInfoTooltip
-                ) {
-
-                    positionInfoTooltip();
-                }
-            }
-        );
-
-
-        window.addEventListener(
-            "scroll",
-            () => {
-
-                if (
-                    activeInfoTooltip
-                ) {
-
-                    positionInfoTooltip();
-                }
-            },
-            true
-        );
-
-
-        document.addEventListener(
-            "mousedown",
-            event => {
-
-                if (
-                    !activeInfoTooltip
-                ) {
-                    return;
-                }
-
-
-                if (
-                    activeInfoTooltip.contains(
-                        event.target
-                    )
-                ) {
-                    return;
-                }
-
-
-                if (
-                    activeInfoButton &&
-                    activeInfoButton.contains(
-                        event.target
-                    )
-                ) {
-                    return;
-                }
-
-
-                hideInfoTooltip();
-            }
-        );
-
+        // =====================================================
+        // ESCAPE KEY
+        // =====================================================
 
         document.addEventListener(
             "keydown",
             event => {
 
                 if (
-                    event.key === "Escape"
+                    event.key === "Escape" &&
+                    infoDrawer &&
+                    infoDrawer.classList.contains(
+                        "open"
+                    )
                 ) {
 
-                    hideInfoTooltip();
-
-                    closeInfoDrawerPanel();
+                    closeInfoDrawer();
                 }
+
             }
         );
 
@@ -1830,47 +1455,78 @@ document.addEventListener(
         // EVENTS
         // =====================================================
 
-        datasetSelect.addEventListener(
-            "change",
-            async () => {
+        if (datasetSelect) {
 
-                try {
+            datasetSelect.addEventListener(
+                "change",
+                async () => {
 
-                    await loadFilterOptions();
+                    try {
+
+                        await loadFilterOptions();
+
+                        await loadDashboard();
+
+                    } catch (error) {
+
+                        showError(
+                            error.message
+                        );
+                    }
+
+                }
+            );
+        }
+
+
+        if (applyFilters) {
+
+            applyFilters.addEventListener(
+                "click",
+                loadDashboard
+            );
+        }
+
+
+        if (resetFilters) {
+
+            resetFilters.addEventListener(
+                "click",
+                async () => {
+
+                    if (startDate) {
+
+                        startDate.value =
+                            "";
+                    }
+
+
+                    if (endDate) {
+
+                        endDate.value =
+                            "";
+                    }
+
+
+                    if (categoryFilter) {
+
+                        categoryFilter.value =
+                            "";
+                    }
+
+
+                    if (regionFilter) {
+
+                        regionFilter.value =
+                            "";
+                    }
+
 
                     await loadDashboard();
 
-                } catch (error) {
-
-                    showError(
-                        error.message
-                    );
-
                 }
-
-            }
-        );
-
-
-        applyFilters.addEventListener(
-            "click",
-            loadDashboard
-        );
-
-
-        resetFilters.addEventListener(
-            "click",
-            async () => {
-
-                startDate.value = "";
-                endDate.value = "";
-
-                categoryFilter.value = "";
-                regionFilter.value = "";
-
-                await loadDashboard();
-            }
-        );
+            );
+        }
 
 
         // =====================================================
@@ -1878,6 +1534,16 @@ document.addEventListener(
         // =====================================================
 
         async function initialize() {
+
+            /*
+             * If this is not the dashboard page,
+             * there is nothing to initialize here.
+             */
+
+            if (!datasetSelect) {
+                return;
+            }
+
 
             if (
                 typeof Chart ===
@@ -1909,12 +1575,11 @@ document.addEventListener(
                     error
                 );
 
+
                 showError(
                     error.message
                 );
-
             }
-
         }
 
 

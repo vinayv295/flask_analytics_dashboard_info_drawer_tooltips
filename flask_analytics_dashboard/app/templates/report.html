@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -14,894 +12,798 @@
         Report - {{ dataset.file_name }}
     </title>
 
-    <style>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
+    <!-- DataTables -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"
+    >
+    <link
+        rel="stylesheet"
+        href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"
+    >
+
+    <style>
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background: #f5f7fa;
-            color: #222;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #172033;
+            background: #f5f7fb;
         }
 
-        .page {
-            width: 92%;
-            max-width: 1200px;
-            margin: 30px auto;
+        .nav-info-button {
+            border: 0;
+            margin: 0;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .report-page {
+            width: min(1200px, calc(100% - 48px));
+            margin: 38px auto 60px;
         }
 
         .report-header {
-            background: white;
-
+            margin-bottom: 24px;
             padding: 25px;
+            background: #ffffff;
+            border: 1px solid #e1e5ec;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+        }
 
-            border-radius: 10px;
-
-            border: 1px solid #ddd;
-
-            margin-bottom: 25px;
+        .report-header .eyebrow {
+            margin-bottom: 8px;
         }
 
         .report-header h1 {
-            margin-top: 0;
-            margin-bottom: 8px;
+            margin: 0 0 10px;
+            color: #172033;
+            font-size: 30px;
+            line-height: 1.25;
         }
 
-        .report-header p {
-            margin: 5px 0;
-            color: #666;
-        }
-
-        .actions {
-            margin-top: 20px;
-        }
-
-        .button {
-            display: inline-block;
-
-            padding: 10px 16px;
-
-            border-radius: 6px;
-
-            border: none;
-
-            cursor: pointer;
-
-            text-decoration: none;
-
-            font-size: 14px;
-        }
-
-        .print-button {
-            background: #1565c0;
-            color: white;
-        }
-
-        .back-button {
-            background: #eee;
-            color: #222;
-            margin-left: 8px;
-        }
-
-        .section {
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            margin-bottom: 15px;
-        }
-
-        .section-title h2 {
-            margin-bottom: 5px;
-        }
-
-        .section-title p {
-            margin-top: 0;
-            color: #666;
-        }
-
-        /* =================================================
-           KPI CARDS
-        ================================================= */
-
-        .kpi-grid {
+        .report-meta {
             display: grid;
-
-            grid-template-columns:
-                repeat(4, minmax(0, 1fr));
-
-            gap: 18px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px 18px;
+            margin-top: 16px;
         }
 
-        .kpi-card {
-            background: white;
-
-            border: 1px solid #ddd;
-
-            border-radius: 10px;
-
-            padding: 20px;
-
-            box-shadow:
-                0 2px 8px
-                rgba(0, 0, 0, 0.05);
-        }
-
-        .kpi-label {
+        .report-meta-item {
+            color: #64748b;
             font-size: 13px;
-            color: #666;
-
-            margin-bottom: 8px;
-        }
-
-        .kpi-value {
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-        /* =================================================
-           INSIGHTS
-        ================================================= */
-
-        .insight-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap: 15px;
-        }
-
-        .insight-card {
-            background: white;
-
-            border: 1px solid #ddd;
-
-            border-radius: 10px;
-
-            padding: 18px;
-        }
-
-        .insight-title {
-            font-weight: bold;
-
-            margin-bottom: 8px;
-        }
-
-        .insight-message {
-            color: #555;
-
             line-height: 1.5;
         }
 
-        /* =================================================
-           TABLES
-        ================================================= */
-
-        .table-container {
-            overflow-x: auto;
-
-            background: white;
-
-            border-radius: 10px;
-
-            border: 1px solid #ddd;
+        .report-meta-item strong {
+            color: #33415c;
         }
 
-        table {
-            width: 100%;
-
-            border-collapse: collapse;
+        .report-back {
+            display: inline-flex;
+            align-items: center;
+            min-height: 39px;
+            margin-top: 18px;
+            padding: 0 14px;
+            border-radius: 9px;
+            color: #44516a;
+            background: #f1f4f8;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
         }
 
-        th,
-        td {
-            padding: 12px;
-
-            text-align: left;
-
-            border-bottom: 1px solid #eee;
+        .report-section {
+            margin-bottom: 24px;
         }
 
-        th {
-            background: #f0f2f5;
+        .section-title {
+            margin-bottom: 14px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        .section-title h2 {
+            margin: 0 0 5px;
+            color: #172033;
+            font-size: 21px;
         }
 
-        /* =================================================
-           TWO COLUMN SECTION
-        ================================================= */
+        .section-title p {
+            margin: 0;
+            color: #7b8798;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .kpi-card {
+            min-width: 0;
+            padding: 19px;
+            background: #ffffff;
+            border: 1px solid #e1e5ec;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.045);
+        }
+
+        .kpi-label {
+            margin-bottom: 8px;
+            color: #7b8798;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .kpi-value {
+            color: #172033;
+            font-size: 23px;
+            font-weight: 800;
+            line-height: 1.25;
+            word-break: break-word;
+        }
 
         .two-column {
             display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 20px;
         }
 
         .report-box {
-            background: white;
-
-            border: 1px solid #ddd;
-
-            border-radius: 10px;
-
+            min-width: 0;
             padding: 20px;
+            background: #ffffff;
+            border: 1px solid #e1e5ec;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.045);
         }
 
         .report-box h3 {
-            margin-top: 0;
+            margin: 0 0 15px;
+            color: #27344d;
+            font-size: 17px;
         }
 
-        /* =================================================
-           PRINT
-        ================================================= */
-
-        @media print {
-
-            body {
-                background: white;
-            }
-
-            .page {
-                width: 100%;
-                max-width: none;
-
-                margin: 0;
-            }
-
-            .actions {
-                display: none;
-            }
-
-            .report-header,
-            .kpi-card,
-            .insight-card,
-            .report-box,
-            .table-container {
-                box-shadow: none;
-            }
-
-            .section {
-                page-break-inside: avoid;
-            }
-
+        .table-container {
+            overflow-x: auto;
         }
 
-        /* =================================================
-           RESPONSIVE
-        ================================================= */
+        .product-switcher {
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #e1e5ec;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.045);
+        }
 
-        @media (max-width: 900px) {
+        .product-switcher-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
 
+        .product-tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .product-tab,
+        .product-arrow {
+            min-height: 38px;
+            border: 1px solid #dce2eb;
+            border-radius: 9px;
+            color: #44516a;
+            background: #f7f8fb;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .product-tab {
+            padding: 0 14px;
+        }
+
+        .product-arrow {
+            width: 38px;
+        }
+
+        .product-tab:hover,
+        .product-arrow:hover,
+        .product-tab.active {
+            color: #ffffff;
+            border-color: #4f46e5;
+            background: #4f46e5;
+        }
+
+        .product-arrows {
+            display: flex;
+            gap: 7px;
+        }
+
+        .product-slide {
+            display: none;
+        }
+
+        .product-slide.active {
+            display: block;
+            animation: reportSlideIn 0.2s ease;
+        }
+
+        @keyframes reportSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .product-slide-title {
+            margin: 0 0 4px;
+            color: #27344d;
+            font-size: 17px;
+        }
+
+        .product-slide-description {
+            margin: 0 0 15px;
+            color: #7b8798;
+            font-size: 12px;
+        }
+
+        .site-footer-report {
+            padding: 20px;
+            color: #8b95a7;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .dt-container {
+            width: 100%;
+            padding-top: 10px;
+        }
+
+        .dt-search input,
+        .dt-length select {
+            min-height: 36px;
+            border: 1px solid #dce2eb !important;
+            border-radius: 9px !important;
+            background: #ffffff !important;
+        }
+
+        .dt-paging .dt-paging-button {
+            border-radius: 8px !important;
+        }
+
+        .dt-info {
+            color: #7b8798;
+            font-size: 12px;
+        }
+
+        @media (max-width: 950px) {
             .kpi-grid {
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .report-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 750px) {
+            .report-page {
+                width: calc(100% - 28px);
+                margin-top: 25px;
             }
 
             .two-column {
                 grid-template-columns: 1fr;
             }
 
+            .product-switcher-controls {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .product-arrows {
+                justify-content: flex-end;
+            }
         }
 
         @media (max-width: 600px) {
-
-            .kpi-grid {
+            .kpi-grid,
+            .report-meta {
                 grid-template-columns: 1fr;
             }
 
-            .insight-grid {
-                grid-template-columns: 1fr;
+            .report-header,
+            .report-box,
+            .product-switcher {
+                padding: 17px;
             }
 
+            .report-header h1 {
+                font-size: 25px;
+            }
         }
-
     </style>
-
 </head>
 
 <body>
 
-<div class="page">
+<header class="top-navbar">
+    <div class="nav-container">
 
-    <!-- =================================================
-         REPORT HEADER
-    ================================================= -->
+        <a
+            href="{{ url_for('main.dashboard') }}"
+            class="brand"
+        >
+            <span class="brand-icon">◆</span>
+            <span>
+                Analytics
+                <strong>Dashboard</strong>
+            </span>
+        </a>
 
-    <div class="report-header">
+        <nav class="main-navigation">
 
-        <h1>
-            Business Analytics Report
-        </h1>
-
-        <p>
-            <strong>Dataset:</strong>
-            {{ dataset.file_name }}
-        </p>
-
-        <p>
-            <strong>Rows:</strong>
-            {{ dataset.row_count }}
-        </p>
-
-        <p>
-            <strong>Status:</strong>
-            {{ dataset.status }}
-        </p>
-
-        {% if start_date or end_date or
-              selected_category or selected_region %}
-
-            <p>
-                <strong>Filters:</strong>
-
-                {% if start_date %}
-                    From {{ start_date }}
-                {% endif %}
-
-                {% if end_date %}
-                    To {{ end_date }}
-                {% endif %}
-
-                {% if selected_category %}
-                    | Category:
-                    {{ selected_category }}
-                {% endif %}
-
-                {% if selected_region %}
-                    | Region:
-                    {{ selected_region }}
-                {% endif %}
-
-            </p>
-
-        {% endif %}
-
-        <div class="actions">
-
-            <button
-                class="button print-button"
-                onclick="window.print()"
+            <a
+                href="{{ url_for('main.dashboard') }}"
+                class="nav-link"
             >
-                Print Report
-            </button>
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a
+                href="{{ url_for('main.upload') }}"
+                class="nav-link"
+            >
+                <span class="nav-icon">↑</span>
+                Upload Data
+            </a>
+
+            <a
+                href="{{ url_for('main.datasets') }}"
+                class="nav-link"
+            >
+                <span class="nav-icon">▦</span>
+                Datasets
+            </a>
 
             <a
                 href="{{ url_for('main.reports') }}"
-                class="button back-button"
+                class="nav-link active"
             >
-                Back to Reports
+                <span class="nav-icon">▤</span>
+                Reports
             </a>
 
+        </nav>
+    </div>
+</header>
+
+<main class="report-page">
+
+    <section class="report-header">
+        <div class="eyebrow">BUSINESS REPORT</div>
+
+        <h1>Business Analytics Report</h1>
+
+        <div class="report-meta">
+            <div class="report-meta-item">
+                <strong>Dataset:</strong>
+                {{ dataset.file_name }}
+            </div>
+
+            <div class="report-meta-item">
+                <strong>Rows:</strong>
+                {{ dataset.row_count }}
+            </div>
+
+            <div class="report-meta-item">
+                <strong>Status:</strong>
+                {{ dataset.status }}
+            </div>
+
+            {% if filters.start_date or filters.end_date or filters.category or filters.region %}
+                <div class="report-meta-item">
+                    <strong>Filters:</strong>
+                    {% if filters.start_date %}From {{ filters.start_date }}{% endif %}
+                    {% if filters.end_date %} To {{ filters.end_date }}{% endif %}
+                    {% if filters.category %} | Category: {{ filters.category }}{% endif %}
+                    {% if filters.region %} | Region: {{ filters.region }}{% endif %}
+                </div>
+            {% endif %}
         </div>
 
-    </div>
+        <a
+            href="{{ url_for('main.reports') }}"
+            class="report-back"
+        >
+            ← Back to Reports
+        </a>
+    </section>
 
-
-    <!-- =================================================
-         KPI SECTION
-    ================================================= -->
-
-    <div class="section">
-
+    <section class="report-section">
         <div class="section-title">
-
-            <h2>
-                Key Performance Indicators
-            </h2>
-
-            <p>
-                Overall performance summary.
-            </p>
-
+            <h2>Key Performance Indicators</h2>
+            <p>Overall performance summary for the selected dataset and filters.</p>
         </div>
 
         <div class="kpi-grid">
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Total Sales
-                </div>
-
+                <div class="kpi-label">Total Sales</div>
                 <div class="kpi-value">
-                    ₹{{ "{:,.2f}".format(
-                        kpis.total_sales
-                    ) }}
+                    ₹{{ "{:,.2f}".format(kpis.total_sales) }}
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Total Profit
-                </div>
-
+                <div class="kpi-label">Total Profit</div>
                 <div class="kpi-value">
-                    ₹{{ "{:,.2f}".format(
-                        kpis.total_profit
-                    ) }}
+                    ₹{{ "{:,.2f}".format(kpis.total_profit) }}
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Total Orders
-                </div>
-
+                <div class="kpi-label">Total Orders</div>
                 <div class="kpi-value">
-                    {{ "{:,}".format(
-                        kpis.total_orders
-                    ) }}
+                    {{ "{:,}".format(kpis.total_orders) }}
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Units Sold
-                </div>
-
+                <div class="kpi-label">Units Sold</div>
                 <div class="kpi-value">
-                    {{ "{:,}".format(
-                        kpis.units_sold
-                    ) }}
+                    {{ "{:,}".format(kpis.units_sold) }}
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Profit Margin
-                </div>
-
+                <div class="kpi-label">Profit Margin</div>
                 <div class="kpi-value">
-                    {{ "{:.2f}".format(
-                        kpis.profit_margin
-                    ) }}%
+                    {{ "{:.2f}".format(kpis.profit_margin) }}%
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Average Order Value
-                </div>
-
+                <div class="kpi-label">Average Order Value</div>
                 <div class="kpi-value">
-                    ₹{{ "{:,.2f}".format(
-                        kpis.average_order_value
-                    ) }}
+                    ₹{{ "{:,.2f}".format(kpis.average_order_value) }}
                 </div>
-
             </div>
 
-
             <div class="kpi-card">
-
-                <div class="kpi-label">
-                    Average Discount
-                </div>
-
+                <div class="kpi-label">Average Discount</div>
                 <div class="kpi-value">
-                    {{ "{:.2f}".format(
-                        kpis.average_discount
-                    ) }}%
+                    {{ "{:.2f}".format(kpis.average_discount) }}%
                 </div>
-
             </div>
-
         </div>
+    </section>
 
-    </div>
-
-
-    <!-- =================================================
-         AUTOMATIC INSIGHTS
-    ================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h2>
-                Automatic Insights
-            </h2>
-
-            <p>
-                Important observations generated
-                from the dataset.
-            </p>
-
-        </div>
-
-        <div class="insight-grid">
-
-            {% for insight in insights %}
-
-                <div class="insight-card">
-
-                    <div class="insight-title">
-                        {{ insight.title }}
-                    </div>
-
-                    <div class="insight-message">
-                        {{ insight.message }}
-                    </div>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    </div>
-
-
-    <!-- =================================================
-         CATEGORY + MONTHLY
-    ================================================= -->
-
-    <div class="section">
-
+    <section class="report-section">
         <div class="two-column">
 
-            <!-- CATEGORY -->
-
             <div class="report-box">
-
-                <h3>
-                    Category Performance
-                </h3>
+                <h3>Category Performance</h3>
 
                 <div class="table-container">
-
-                    <table>
-
+                    <table class="js-data-table">
                         <thead>
-
                             <tr>
                                 <th>Category</th>
                                 <th>Sales</th>
                                 <th>Profit</th>
                             </tr>
-
                         </thead>
 
                         <tbody>
-
                             {% for item in category_data %}
-
                                 <tr>
-
-                                    <td>
-                                        {{ item.category
-                                            or "Unknown" }}
+                                    <td>{{ item.category or "Unknown" }}</td>
+                                    <td data-order="{{ item.sales }}">
+                                        ₹{{ "{:,.2f}".format(item.sales) }}
                                     </td>
-
-                                    <td>
-                                        ₹{{ "{:,.2f}".format(
-                                            item.sales
-                                        ) }}
+                                    <td data-order="{{ item.profit }}">
+                                        ₹{{ "{:,.2f}".format(item.profit) }}
                                     </td>
-
-                                    <td>
-                                        ₹{{ "{:,.2f}".format(
-                                            item.profit
-                                        ) }}
-                                    </td>
-
                                 </tr>
-
                             {% else %}
-
                                 <tr>
-
-                                    <td
-                                        colspan="3"
-                                    >
-                                        No category data
-                                        available.
-                                    </td>
-
+                                    <td colspan="3">No category data available.</td>
                                 </tr>
-
                             {% endfor %}
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
 
-
-            <!-- MONTHLY -->
-
             <div class="report-box">
-
-                <h3>
-                    Monthly Performance
-                </h3>
+                <h3>Monthly Performance</h3>
 
                 <div class="table-container">
-
-                    <table>
-
+                    <table class="js-data-table">
                         <thead>
-
                             <tr>
                                 <th>Month</th>
                                 <th>Sales</th>
                                 <th>Profit</th>
                             </tr>
-
                         </thead>
 
                         <tbody>
-
                             {% for item in monthly_data %}
-
                                 <tr>
-
-                                    <td>
-                                        {{ item.month }}
+                                    <td>{{ item.month }}</td>
+                                    <td data-order="{{ item.sales }}">
+                                        ₹{{ "{:,.2f}".format(item.sales) }}
                                     </td>
-
-                                    <td>
-                                        ₹{{ "{:,.2f}".format(
-                                            item.sales
-                                        ) }}
+                                    <td data-order="{{ item.profit }}">
+                                        ₹{{ "{:,.2f}".format(item.profit) }}
                                     </td>
-
-                                    <td>
-                                        ₹{{ "{:,.2f}".format(
-                                            item.profit
-                                        ) }}
-                                    </td>
-
                                 </tr>
-
                             {% else %}
-
                                 <tr>
-
-                                    <td
-                                        colspan="3"
-                                    >
-                                        No monthly data
-                                        available.
-                                    </td>
-
+                                    <td colspan="3">No monthly data available.</td>
                                 </tr>
-
                             {% endfor %}
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
 
         </div>
+    </section>
 
-    </div>
+    <!-- =====================================================
+         PRODUCT SLIDER
+    ====================================================== -->
 
-
-    <!-- =================================================
-         TOP PRODUCTS
-    ================================================= -->
-
-    <div class="section">
-
+    <section class="report-section">
         <div class="section-title">
-
-            <h2>
-                Top Products
-            </h2>
-
+            <h2>Product Performance</h2>
             <p>
-                Products ranked by sales.
+                Use the buttons or arrows to slide between the top-products and bottom-products tables.
             </p>
-
         </div>
 
-        <div class="table-container">
+        <div class="product-switcher">
 
-            <table>
+            <div class="product-switcher-controls">
+                <div class="product-tab-buttons">
+                    <button
+                        type="button"
+                        class="product-tab active"
+                        data-product-slide="top"
+                    >
+                        Top Products
+                    </button>
 
-                <thead>
+                    <button
+                        type="button"
+                        class="product-tab"
+                        data-product-slide="bottom"
+                    >
+                        Bottom Products
+                    </button>
+                </div>
 
-                    <tr>
-                        <th>Rank</th>
-                        <th>Product</th>
-                        <th>Sales</th>
-                        <th>Profit</th>
-                    </tr>
+                <div class="product-arrows">
+                    <button
+                        type="button"
+                        class="product-arrow"
+                        id="productPrev"
+                        aria-label="Previous product table"
+                    >
+                        ←
+                    </button>
 
-                </thead>
+                    <button
+                        type="button"
+                        class="product-arrow"
+                        id="productNext"
+                        aria-label="Next product table"
+                    >
+                        →
+                    </button>
+                </div>
+            </div>
 
-                <tbody>
+            <div
+                class="product-slide active"
+                id="topProductSlide"
+                data-product-panel="top"
+            >
+                <h3 class="product-slide-title">Top Products</h3>
+                <p class="product-slide-description">
+                    Products ranked by sales from highest to lowest.
+                </p>
 
-                    {% for item in top_products %}
+                <div class="table-container">
+                    <table class="js-data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Sales</th>
+                                <th>Profit</th>
+                            </tr>
+                        </thead>
 
-                        <tr>
+                        <tbody>
+                            {% for item in top_products %}
+                                <tr>
+                                    <td data-order="{{ loop.index }}">{{ loop.index }}</td>
+                                    <td>{{ item.product_name }}</td>
+                                    <td data-order="{{ item.sales }}">
+                                        ₹{{ "{:,.2f}".format(item.sales) }}
+                                    </td>
+                                    <td data-order="{{ item.profit }}">
+                                        ₹{{ "{:,.2f}".format(item.profit) }}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">No product data available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                            <td>
-                                {{ loop.index }}
-                            </td>
+            <div
+                class="product-slide"
+                id="bottomProductSlide"
+                data-product-panel="bottom"
+            >
+                <h3 class="product-slide-title">Bottom Products</h3>
+                <p class="product-slide-description">
+                    Products ranked by sales from lowest to highest.
+                </p>
 
-                            <td>
-                                {{ item.product_name }}
-                            </td>
+                <div class="table-container">
+                    <table class="js-data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Sales</th>
+                                <th>Profit</th>
+                            </tr>
+                        </thead>
 
-                            <td>
-                                ₹{{ "{:,.2f}".format(
-                                    item.sales
-                                ) }}
-                            </td>
-
-                            <td>
-                                ₹{{ "{:,.2f}".format(
-                                    item.profit
-                                ) }}
-                            </td>
-
-                        </tr>
-
-                    {% else %}
-
-                        <tr>
-
-                            <td colspan="4">
-                                No product data
-                                available.
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    <!-- =================================================
-         BOTTOM PRODUCTS
-    ================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h2>
-                Bottom Products
-            </h2>
-
-            <p>
-                Products with the lowest sales.
-            </p>
-
-        </div>
-
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Rank</th>
-                        <th>Product</th>
-                        <th>Sales</th>
-                        <th>Profit</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for item in bottom_products %}
-
-                        <tr>
-
-                            <td>
-                                {{ loop.index }}
-                            </td>
-
-                            <td>
-                                {{ item.product_name }}
-                            </td>
-
-                            <td>
-                                ₹{{ "{:,.2f}".format(
-                                    item.sales
-                                ) }}
-                            </td>
-
-                            <td>
-                                ₹{{ "{:,.2f}".format(
-                                    item.profit
-                                ) }}
-                            </td>
-
-                        </tr>
-
-                    {% else %}
-
-                        <tr>
-
-                            <td colspan="4">
-                                No product data
-                                available.
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
+                        <tbody>
+                            {% for item in bottom_products %}
+                                <tr>
+                                    <td data-order="{{ loop.index }}">{{ loop.index }}</td>
+                                    <td>{{ item.product_name }}</td>
+                                    <td data-order="{{ item.sales }}">
+                                        ₹{{ "{:,.2f}".format(item.sales) }}
+                                    </td>
+                                    <td data-order="{{ item.profit }}">
+                                        ₹{{ "{:,.2f}".format(item.profit) }}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">No product data available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
         </div>
+    </section>
 
-    </div>
-
-
-    <!-- =================================================
-         FOOTER
-    ================================================= -->
-
-    <div
-        style="
-            text-align:center;
-            margin-top:40px;
-            padding:20px;
-            color:#777;
-            font-size:13px;
-        "
-    >
-
+    <footer class="site-footer-report">
         Generated by Flask Analytics Dashboard
+    </footer>
 
-    </div>
+</main>
 
-</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="{{ url_for('static', filename='js/tables.js') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const tabs = Array.from(
+            document.querySelectorAll("[data-product-slide]")
+        );
+
+        const panels = Array.from(
+            document.querySelectorAll("[data-product-panel]")
+        );
+
+        const previousButton = document.getElementById("productPrev");
+        const nextButton = document.getElementById("productNext");
+
+        let current = 0;
+
+        function showProductSlide(index) {
+            current = (index + panels.length) % panels.length;
+            const key = panels[current]?.dataset.productPanel;
+
+            panels.forEach(panel => {
+                panel.classList.toggle(
+                    "active",
+                    panel.dataset.productPanel === key
+                );
+            });
+
+            tabs.forEach(tab => {
+                tab.classList.toggle(
+                    "active",
+                    tab.dataset.productSlide === key
+                );
+            });
+
+            window.requestAnimationFrame(() => {
+                const activePanel = panels[current];
+                const table = activePanel?.querySelector("table");
+
+                if (
+                    table &&
+                    window.jQuery &&
+                    window.jQuery.fn.DataTable &&
+                    window.jQuery.fn.DataTable.isDataTable(table)
+                ) {
+                    window.jQuery(table)
+                        .DataTable()
+                        .columns
+                        .adjust()
+                        .responsive
+                        .recalc();
+                }
+            });
+        }
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("click", function () {
+                const key = tab.dataset.productSlide;
+                const targetIndex = panels.findIndex(
+                    panel => panel.dataset.productPanel === key
+                );
+
+                showProductSlide(
+                    targetIndex >= 0 ? targetIndex : index
+                );
+            });
+        });
+
+        previousButton?.addEventListener("click", function () {
+            showProductSlide(current - 1);
+        });
+
+        nextButton?.addEventListener("click", function () {
+            showProductSlide(current + 1);
+        });
+
+        showProductSlide(0);
+    });
+</script>
 
 </body>
-
 </html>
